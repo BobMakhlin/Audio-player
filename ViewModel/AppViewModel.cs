@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight.Command;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -22,11 +23,10 @@ namespace AudioPlayer.ViewModel
 
         static DispatcherTimer timer;
 
-        Song song = new Song
-        {
-            Path = "music.mp3"
-        };
-        Song Song { get => song; set => song = value; }
+        ObservableCollection<Song> songs;
+
+        public Song CurrentSong { get; set; }
+        public ObservableCollection<Song> Songs { get => songs; set => songs = value; }
 
         private Visibility buttonPlayVisiblity = Visibility.Visible;
         public Visibility ButtonPlayVisiblity
@@ -35,7 +35,7 @@ namespace AudioPlayer.ViewModel
             set
             {
                 buttonPlayVisiblity = value;
-                INotifyPropertyChanged("ButtonPlayVisiblity");
+                INotifyPropertyChanged();
             }
         }
 
@@ -46,12 +46,13 @@ namespace AudioPlayer.ViewModel
             set
             {
                 buttonPauseVisibility = value;
-                INotifyPropertyChanged("ButtonPauseVisibility");
+                INotifyPropertyChanged();
             }
         }
 
         public ICommand CommandPlay { get; private set; }
         public ICommand CommandPause { get; private set; }
+        public ICommand CommandChangeSong { get; private set; }
 
         static AppViewModel()
         {
@@ -61,37 +62,71 @@ namespace AudioPlayer.ViewModel
 
         public AppViewModel()
         {
+            songs = Storage.GetSongs();
+            CurrentSong = songs[0];
+
             wave = new WaveOutEvent();
-            mediaReader = new MediaFoundationReader(song.Path);
-            wave.Init(mediaReader);
 
             CommandPlay = new RelayCommand(PlayMusic);
             CommandPause = new RelayCommand(PauseMusic);
+            CommandChangeSong = new RelayCommand(ChangeSong);
 
             timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
         }
 
         private void PlayMusic()
         {
+            // If music wasn't paused.
+            if (mediaReader == null || mediaReader.Position == 0)
+            {
+                mediaReader = new MediaFoundationReader(CurrentSong.Path);
+                wave.Init(mediaReader);
+            }
+
             wave.Play();
             timer.Start();
 
-            ButtonPlayVisiblity = Visibility.Hidden;
-            ButtonPauseVisibility = Visibility.Visible;
+            ShowPauseButton();
         }
 
         private void PauseMusic()
         {
-            wave.Stop();
+            wave.Pause();
             timer.Stop();
 
+            ShowPlayButton();
+        }
+
+        void ChangeSong()
+        {
+            mediaReader = null;
+            wave.Stop();
+            timer.Stop();
+            INotifyPropertyChanged("MediaReader");
+
+            ShowPlayButton();
+        }
+
+        /// <summary>
+        /// Make button play visible and button pause hidden.
+        /// </summary>
+        void ShowPlayButton()
+        {
             ButtonPauseVisibility = Visibility.Hidden;
             ButtonPlayVisiblity = Visibility.Visible;
+        }
+        /// <summary>
+        /// Make button pause visible and button play hidden.
+        /// </summary>
+        void ShowPauseButton()
+        {
+            ButtonPlayVisiblity = Visibility.Hidden;
+            ButtonPauseVisibility = Visibility.Visible;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        void INotifyPropertyChanged(string propName)
+        void INotifyPropertyChanged([CallerMemberName] string propName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }

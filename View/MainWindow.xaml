@@ -4,27 +4,50 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:wave="clr-namespace:NAudio.Wave;assembly=NAudio"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:AudioPlayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
     <Grid>
-        <StackPanel VerticalAlignment="Bottom">
-            <Grid Height="65" Width="65" HorizontalAlignment="Center">
-                <Image Source="/Resources/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <ListBox ItemsSource="{Binding Songs}" SelectedValue="{Binding Path=CurrentSong, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <Label FontSize="16" Content="{Binding Path=Name}"/>
+                        <Label Content="{Binding Path=Duration}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding CommandChangeSong}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ListBox>
+
+        <StackPanel VerticalAlignment="Bottom" Grid.Column="1">
+            <Grid Height="50" Width="50" HorizontalAlignment="Center">
+                <Image Source="/Resources/img/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
                     <Image.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
                     </Image.InputBindings>
                 </Image>
 
-                <Image Source="/Resources/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
+                <Image Source="/Resources/img/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
                     <Image.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
                     </Image.InputBindings>
                 </Image>
             </Grid>
 
-            <Slider Height="30" VerticalAlignment="Bottom"
+            <Slider Height="25" VerticalAlignment="Bottom"
                 Value="{Binding Path=MediaReader.Position, Mode=TwoWay}" 
                 Maximum="{Binding Path=MediaReader.Length, Mode=OneWay}"/>
         </StackPanel>
