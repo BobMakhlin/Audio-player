@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace AudioPlayer.ViewModel
 {
@@ -19,11 +20,12 @@ namespace AudioPlayer.ViewModel
         MediaFoundationReader mediaReader;
         public MediaFoundationReader MediaReader => mediaReader;
 
+        static DispatcherTimer timer;
+
         Song song = new Song
         {
             Path = "music.mp3"
         };
-
         Song Song { get => song; set => song = value; }
 
         private Visibility buttonPlayVisiblity = Visibility.Visible;
@@ -33,7 +35,7 @@ namespace AudioPlayer.ViewModel
             set
             {
                 buttonPlayVisiblity = value;
-                INotifyPropertyChanged();
+                INotifyPropertyChanged("ButtonPlayVisiblity");
             }
         }
 
@@ -44,12 +46,18 @@ namespace AudioPlayer.ViewModel
             set
             {
                 buttonPauseVisibility = value;
-                INotifyPropertyChanged();
+                INotifyPropertyChanged("ButtonPauseVisibility");
             }
         }
 
         public ICommand CommandPlay { get; private set; }
         public ICommand CommandPause { get; private set; }
+
+        static AppViewModel()
+        {
+            timer = new DispatcherTimer();
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+        }
 
         public AppViewModel()
         {
@@ -59,11 +67,14 @@ namespace AudioPlayer.ViewModel
 
             CommandPlay = new RelayCommand(PlayMusic);
             CommandPause = new RelayCommand(PauseMusic);
+
+            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
         }
 
         private void PlayMusic()
         {
             wave.Play();
+            timer.Start();
 
             ButtonPlayVisiblity = Visibility.Hidden;
             ButtonPauseVisibility = Visibility.Visible;
@@ -72,6 +83,7 @@ namespace AudioPlayer.ViewModel
         private void PauseMusic()
         {
             wave.Stop();
+            timer.Stop();
 
             ButtonPauseVisibility = Visibility.Hidden;
             ButtonPlayVisiblity = Visibility.Visible;
@@ -79,7 +91,7 @@ namespace AudioPlayer.ViewModel
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        void INotifyPropertyChanged([CallerMemberName] string propName = "")
+        void INotifyPropertyChanged(string propName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }

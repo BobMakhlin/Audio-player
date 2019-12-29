@@ -8,25 +8,25 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
 
-    <Window.Resources>
-        
-    </Window.Resources>
-
     <Grid>
-        <Grid VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,5" Height="65" Width="65">
-            <Image Source="/Resources/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
-                <Image.InputBindings>
-                    <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
-                </Image.InputBindings>
-            </Image>
+        <StackPanel VerticalAlignment="Bottom">
+            <Grid Height="65" Width="65" HorizontalAlignment="Center">
+                <Image Source="/Resources/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
+                    <Image.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
+                    </Image.InputBindings>
+                </Image>
 
-            <Image Source="/Resources/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
-                <Image.InputBindings>
-                    <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
-                </Image.InputBindings>
-            </Image>
-        </Grid>
+                <Image Source="/Resources/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
+                    <Image.InputBindings>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
+                    </Image.InputBindings>
+                </Image>
+            </Grid>
 
-        
+            <Slider Height="30" VerticalAlignment="Bottom"
+                Value="{Binding Path=MediaReader.Position, Mode=TwoWay}" 
+                Maximum="{Binding Path=MediaReader.Length, Mode=OneWay}"/>
+        </StackPanel>
     </Grid>
 </Window>
