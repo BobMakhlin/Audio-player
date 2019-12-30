@@ -1,4 +1,5 @@
-﻿using AudioPlayer.Helpers;
+﻿using AudioPlayer.AppData;
+using AudioPlayer.Helpers;
 using AudioPlayer.Models;
 using GalaSoft.MvvmLight.Command;
 using GongSolutions.Wpf.DragDrop;
@@ -7,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -29,6 +31,8 @@ namespace AudioPlayer.ViewModel
 
         public Song CurrentSong { get; set; }
         public ObservableCollection<Song> Songs { get => songs; set => songs = value; }
+
+        const string Filename = "songs.bin";
 
         private Visibility buttonPlayVisiblity = Visibility.Visible;
         public Visibility ButtonPlayVisiblity
@@ -56,6 +60,7 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandPause { get; private set; }
         public ICommand CommandChangeSong { get; private set; }
         public ICommand CommandDelete { get; private set; }
+        public ICommand ProgramClosing { get; private set; }
 
         static AppViewModel()
         {
@@ -65,8 +70,19 @@ namespace AudioPlayer.ViewModel
 
         public AppViewModel()
         {
-            songs = Storage.GetSongs();
-            CurrentSong = songs[0];
+            try
+            {
+                songs = AppDataManager.LoadSongs(Filename);
+            }
+            catch (Exception)
+            {
+                songs = Storage.GetSongs();
+            }
+
+            if (songs.Count > 0)
+            {
+                CurrentSong = songs[0];
+            }
 
             wave = new WaveOutEvent();
 
@@ -74,12 +90,16 @@ namespace AudioPlayer.ViewModel
             CommandPause = new RelayCommand(PauseMusic);
             CommandChangeSong = new RelayCommand(ChangeSong);
             CommandDelete = new RelayCommand<object>(DeleteSong);
+            ProgramClosing = new RelayCommand(OnProgramClosing);
 
             timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
         }
 
         private void PlayMusic()
         {
+            if (CurrentSong == null)
+                return;
+
             // If music wasn't paused.
             if (mediaReader == null || mediaReader.Position == 0)
             {
@@ -115,6 +135,11 @@ namespace AudioPlayer.ViewModel
         {
             var song = (Song)item;
             songs.Remove(song);
+        }
+
+        void OnProgramClosing()
+        {
+            AppDataManager.SaveSongs(Filename, songs);
         }
 
         /// <summary>
@@ -153,18 +178,20 @@ namespace AudioPlayer.ViewModel
                 var files = obj.GetFileDropList();
                 foreach (var file in files)
                 {
-                    // If the file isn't an audio method "Helper.GetSongDuration" throws an exception.
-                    // So the file will add into the collection only if it is an audio-file.
-                    try
+                    if (Helper.IsAudio(file))
                     {
+                        var filename = Path.GetFileNameWithoutExtension(file);
+                        var extension = Path.GetExtension(file);
+                        var resultFile = $"Songs\\{filename}-{Guid.NewGuid()}{extension}";
+                        File.Copy(file, resultFile);
+
                         var song = new Song()
                         {
-                            Path = file
+                            Path = resultFile
                         };
-                        song.Duration = Helper.GetSongDuration(file);
+                        song.Duration = Helper.GetSongDuration(resultFile);
                         songs.Add(song);
                     }
-                    catch (Exception) { }
                 }
             }
         }

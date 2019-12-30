@@ -16,5 +16,12 @@ namespace AudioPlayer.Helpers
                 return mediaReader.TotalTime;
             }
         }
+        public static bool IsAudio(string file)
+        {
+            using (var mediaReader = new MediaFoundationReader(file))
+            {
+                return mediaReader.CanRead;
+            }
+        }
     }
 }

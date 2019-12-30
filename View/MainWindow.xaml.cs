@@ -28,10 +28,5 @@ namespace AudioPlayer
 
             DataContext = new AppViewModel();
         }
-
-        private void Button_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            MessageBox.Show("test");
-        }
     }
 }
