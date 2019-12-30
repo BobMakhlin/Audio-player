@@ -17,21 +17,25 @@ namespace AudioPlayer.Models
             songs.Add(new Song
             {
                 Path = "Songs\\Abba - Happy new year.mp3",
+                Author = "Abba",
                 Name = "Happy new year"
             });
             songs.Add(new Song
             {
                 Path = "Songs\\Gladiator - Now We Are Free.mp3",
+                Author = "Gladiator",
                 Name = "Now We Are Free"
             });
             songs.Add(new Song
             {
                 Path = "Songs\\Sting - Shape of my heart.mp3",
+                Author = "Sting",
                 Name = "Shape of my heart"
             });
             songs.Add(new Song
             {
                 Path = "Songs\\Pascal Letoublon - Friendships.mp3",
+                Author = "Pascal Letoublon",
                 Name = "Friendships"
             });
             songs.Add(new Song

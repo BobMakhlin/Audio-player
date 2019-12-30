@@ -1,5 +1,7 @@
-﻿using AudioPlayer.Models;
+﻿using AudioPlayer.Helpers;
+using AudioPlayer.Models;
 using GalaSoft.MvvmLight.Command;
+using GongSolutions.Wpf.DragDrop;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -15,7 +17,7 @@ using System.Windows.Threading;
 
 namespace AudioPlayer.ViewModel
 {
-    class AppViewModel : INotifyPropertyChanged
+    class AppViewModel : INotifyPropertyChanged, IDropTarget
     {
         WaveOutEvent wave;
         MediaFoundationReader mediaReader;
@@ -129,6 +131,34 @@ namespace AudioPlayer.ViewModel
         void INotifyPropertyChanged([CallerMemberName] string propName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+
+        void IDropTarget.DragOver(IDropInfo dropInfo)
+        {
+            dropInfo.Effects = DragDropEffects.Move;
+        }
+
+        void IDropTarget.Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.Data is DataObject obj)
+            {
+                var files = obj.GetFileDropList();
+                foreach (var file in files)
+                {
+                    // If the file isn't an audio method "Helper.GetSongDuration" throws an exception.
+                    // So the file will add into the collection only if it is an audio-file.
+                    try
+                    {
+                        var song = new Song()
+                        {
+                            Path = file
+                        };
+                        song.Duration = Helper.GetSongDuration(file);
+                        songs.Add(song);
+                    }
+                    catch (Exception) { }
+                }
+            }
         }
     }
 }
