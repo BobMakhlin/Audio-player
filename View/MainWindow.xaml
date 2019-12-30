@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:AudioPlayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
@@ -16,15 +17,25 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <ListBox ItemsSource="{Binding Songs}" SelectedValue="{Binding Path=CurrentSong, Mode=TwoWay}" 
-                 dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
+        <ListBox ItemsSource="{Binding Songs}" SelectedValue="{Binding Path=CurrentSong, Mode=TwoWay}"
+                 dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel>
-                        <Label FontSize="16" Content="{Binding Path=Name}"/>
-                        <Label Content="{Binding Path=Author}" FontWeight="DemiBold" Margin="0,-6,0,0"/>
-                        <Label Content="{Binding Path=Duration}" Margin="0,-6,0,0"/>
-                    </StackPanel>
+                    <Grid>
+                        <StackPanel>
+                            <Label FontSize="16" Content="{Binding Path=Name}"/>
+                            <Label Content="{Binding Path=Author}" FontWeight="DemiBold" Margin="0,-6"/>
+                            <Label Content="{Binding Path=Duration}"/>
+                        </StackPanel>
+                        <Expander HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5.5,0,0">
+                            <StackPanel>
+                                <Button>Edit</Button>
+                                <!--Go to DataContext on ListBox level to work with-->
+                                <Button Command="{Binding DataContext.CommandDelete, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}"
+                                        CommandParameter="{Binding}">Delete</Button>
+                            </StackPanel>
+                        </Expander>
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
 

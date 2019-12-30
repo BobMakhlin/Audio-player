@@ -55,6 +55,7 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandPlay { get; private set; }
         public ICommand CommandPause { get; private set; }
         public ICommand CommandChangeSong { get; private set; }
+        public ICommand CommandDelete { get; private set; }
 
         static AppViewModel()
         {
@@ -72,6 +73,7 @@ namespace AudioPlayer.ViewModel
             CommandPlay = new RelayCommand(PlayMusic);
             CommandPause = new RelayCommand(PauseMusic);
             CommandChangeSong = new RelayCommand(ChangeSong);
+            CommandDelete = new RelayCommand<object>(DeleteSong);
 
             timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
         }
@@ -107,6 +109,12 @@ namespace AudioPlayer.ViewModel
             INotifyPropertyChanged("MediaReader");
 
             ShowPlayButton();
+        }
+
+        void DeleteSong(object item)
+        {
+            var song = (Song)item;
+            songs.Remove(song);
         }
 
         /// <summary>
