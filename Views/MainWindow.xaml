@@ -17,7 +17,7 @@
             <i:InvokeCommandAction Command="{Binding ProgramClosing}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -36,8 +36,9 @@
                         </StackPanel>
                         <Expander HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5.5,0,0">
                             <StackPanel>
-                                <Button>Edit</Button>
                                 <!--Go to DataContext on ListBox level to work with-->
+                                <Button Command="{Binding DataContext.CommandEdit, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}"
+                                        CommandParameter="{Binding}">Edit</Button>
                                 <Button Command="{Binding DataContext.CommandDelete, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBox}}}"
                                         CommandParameter="{Binding}">Delete</Button>
                             </StackPanel>

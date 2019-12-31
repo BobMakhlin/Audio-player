@@ -1,7 +1,9 @@
 ﻿using AudioPlayer.AppData;
 using AudioPlayer.Helpers;
 using AudioPlayer.Models;
+using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using GongSolutions.Wpf.DragDrop;
 using NAudio.Wave;
 using System;
@@ -34,6 +36,8 @@ namespace AudioPlayer.ViewModel
 
         const string Filename = "songs.bin";
 
+        IWindowService editSong;
+
         private Visibility buttonPlayVisiblity = Visibility.Visible;
         public Visibility ButtonPlayVisiblity
         {
@@ -60,6 +64,7 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandPause { get; private set; }
         public ICommand CommandChangeSong { get; private set; }
         public ICommand CommandDelete { get; private set; }
+        public ICommand CommandEdit { get; private set; }
         public ICommand ProgramClosing { get; private set; }
 
         static AppViewModel()
@@ -68,7 +73,7 @@ namespace AudioPlayer.ViewModel
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
         }
 
-        public AppViewModel()
+        public AppViewModel(IWindowService editSongService)
         {
             try
             {
@@ -89,10 +94,13 @@ namespace AudioPlayer.ViewModel
             CommandPlay = new RelayCommand(PlayMusic);
             CommandPause = new RelayCommand(PauseMusic);
             CommandChangeSong = new RelayCommand(ChangeSong);
-            CommandDelete = new RelayCommand<object>(DeleteSong);
+            CommandDelete = new RelayCommand<Song>(DeleteSong);
+            CommandEdit = new RelayCommand<Song>(EditSong);
             ProgramClosing = new RelayCommand(OnProgramClosing);
 
             timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
+
+            editSong = editSongService;
         }
 
         private void PlayMusic()
@@ -131,10 +139,14 @@ namespace AudioPlayer.ViewModel
             ShowPlayButton();
         }
 
-        void DeleteSong(object item)
+        void DeleteSong(Song song)
         {
-            var song = (Song)item;
             songs.Remove(song);
+        }
+
+        void EditSong(Song song)
+        {
+            editSong.ShowDialog(song);
         }
 
         void OnProgramClosing()

@@ -1,4 +1,7 @@
 ﻿using AudioPlayer.ViewModel;
+using AudioPlayer.Views;
+using AudioPlayer.WindowServices;
+using GalaSoft.MvvmLight.Messaging;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -26,7 +29,7 @@ namespace AudioPlayer
         {
             InitializeComponent();
 
-            DataContext = new AppViewModel();
+            DataContext = new AppViewModel(new WindowService());
         }
     }
 }
