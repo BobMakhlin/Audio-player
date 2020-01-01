@@ -31,10 +31,18 @@ namespace AudioPlayer.ViewModel
 
         ObservableCollection<Song> songs;
 
-        public Song CurrentSong { get; set; }
-        public ObservableCollection<Song> Songs { get => songs; set => songs = value; }
+        Song currentSong;
+        public Song CurrentSong
+        { 
+            get => currentSong; 
+            set
+            {
+                currentSong = value;
+                INotifyPropertyChanged();
+            }
+        }
 
-        const string Filename = "songs.bin";
+        public ObservableCollection<Song> Songs { get => songs; set => songs = value; }
 
         IWindowService editSong;
 
@@ -77,7 +85,7 @@ namespace AudioPlayer.ViewModel
         {
             try
             {
-                songs = AppDataManager.LoadSongs(Filename);
+                songs = AppDataManager.LoadSongs(AppFiles.Filename);
             }
             catch (Exception)
             {
@@ -91,16 +99,21 @@ namespace AudioPlayer.ViewModel
 
             wave = new WaveOutEvent();
 
+            InitCommands();
+
+            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
+
+            editSong = editSongService;
+        }
+
+        void InitCommands()
+        {
             CommandPlay = new RelayCommand(PlayMusic);
             CommandPause = new RelayCommand(PauseMusic);
             CommandChangeSong = new RelayCommand(ChangeSong);
             CommandDelete = new RelayCommand<Song>(DeleteSong);
             CommandEdit = new RelayCommand<Song>(EditSong);
             ProgramClosing = new RelayCommand(OnProgramClosing);
-
-            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
-
-            editSong = editSongService;
         }
 
         private void PlayMusic()
@@ -111,7 +124,7 @@ namespace AudioPlayer.ViewModel
             // If music wasn't paused.
             if (mediaReader == null || mediaReader.Position == 0)
             {
-                mediaReader = new MediaFoundationReader(CurrentSong.Path);
+                mediaReader = new MediaFoundationReader(CurrentSong.SongPath);
                 wave.Init(mediaReader);
             }
 
@@ -151,7 +164,7 @@ namespace AudioPlayer.ViewModel
 
         void OnProgramClosing()
         {
-            AppDataManager.SaveSongs(Filename, songs);
+            AppDataManager.SaveSongs(AppFiles.Filename, songs);
         }
 
         /// <summary>
@@ -194,12 +207,12 @@ namespace AudioPlayer.ViewModel
                     {
                         var filename = Path.GetFileNameWithoutExtension(file);
                         var extension = Path.GetExtension(file);
-                        var resultFile = $"Songs\\{filename}-{Guid.NewGuid()}{extension}";
+                        var resultFile = $"{AppFiles.SongsPath}\\{filename}-{Guid.NewGuid()}{extension}";
                         File.Copy(file, resultFile);
 
                         var song = new Song()
                         {
-                            Path = resultFile
+                            SongPath = resultFile
                         };
                         song.Duration = Helper.GetSongDuration(resultFile);
                         songs.Add(song);
