@@ -16,8 +16,8 @@
             <Label FontSize="24">Author:</Label>
         </StackPanel>
         <StackPanel Grid.Column="1">
-            <TextBox FontSize="24" Margin="3,6,3,0" Text="{Binding Path=Song.Name}"/>
-            <TextBox FontSize="24" Margin="3,8" Text="{Binding Path=Song.Author}"/>
+            <TextBox FontSize="24" Margin="3,6,3,0" Text="{Binding Path=Song.Name, Mode=TwoWay}"/>
+            <TextBox FontSize="24" Margin="3,8" Text="{Binding Path=Song.Author, Mode=TwoWay}"/>
         </StackPanel>
     </Grid>
 </Window>

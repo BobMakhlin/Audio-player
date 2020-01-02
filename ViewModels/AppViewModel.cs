@@ -1,7 +1,7 @@
 ﻿using AudioPlayer.AppData;
+using AudioPlayer.DropHandlers;
 using AudioPlayer.Helpers;
 using AudioPlayer.Models;
-using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GongSolutions.Wpf.DragDrop;
@@ -21,7 +21,7 @@ using System.Windows.Threading;
 
 namespace AudioPlayer.ViewModel
 {
-    class AppViewModel : INotifyPropertyChanged, IDropTarget
+    class AppViewModel : INotifyPropertyChanged
     {
         WaveOutEvent wave;
         MediaFoundationReader mediaReader;
@@ -43,8 +43,6 @@ namespace AudioPlayer.ViewModel
         }
 
         public ObservableCollection<Song> Songs { get => songs; set => songs = value; }
-
-        IWindowService editSong;
 
         private Visibility buttonPlayVisiblity = Visibility.Visible;
         public Visibility ButtonPlayVisiblity
@@ -75,13 +73,16 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandEdit { get; private set; }
         public ICommand ProgramClosing { get; private set; }
 
+        public IDropTarget SongDropHandler { get; private set; }
+        public IDropTarget ImageDropHandler { get; private set; }
+
         static AppViewModel()
         {
             timer = new DispatcherTimer();
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
         }
 
-        public AppViewModel(IWindowService editSongService)
+        public AppViewModel()
         {
             try
             {
@@ -100,10 +101,10 @@ namespace AudioPlayer.ViewModel
             wave = new WaveOutEvent();
 
             InitCommands();
+            SongDropHandler = new SongDropHandler(this);
+            ImageDropHandler = new ImageDropHandler(this);
 
             timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
-
-            editSong = editSongService;
         }
 
         void InitCommands()
@@ -159,7 +160,9 @@ namespace AudioPlayer.ViewModel
 
         void EditSong(Song song)
         {
-            editSong.ShowDialog(song);
+            Messenger.Default.Send(
+                new NotificationMessage<Song>(song, "ShowEditSongWindow")
+                );
         }
 
         void OnProgramClosing()
@@ -189,36 +192,6 @@ namespace AudioPlayer.ViewModel
         void INotifyPropertyChanged([CallerMemberName] string propName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
-
-        void IDropTarget.DragOver(IDropInfo dropInfo)
-        {
-            dropInfo.Effects = DragDropEffects.Move;
-        }
-
-        void IDropTarget.Drop(IDropInfo dropInfo)
-        {
-            if (dropInfo.Data is DataObject obj)
-            {
-                var files = obj.GetFileDropList();
-                foreach (var file in files)
-                {
-                    if (Helper.IsAudio(file))
-                    {
-                        var filename = Path.GetFileNameWithoutExtension(file);
-                        var extension = Path.GetExtension(file);
-                        var resultFile = $"{AppFiles.SongsPath}\\{filename}-{Guid.NewGuid()}{extension}";
-                        File.Copy(file, resultFile);
-
-                        var song = new Song()
-                        {
-                            SongPath = resultFile
-                        };
-                        song.Duration = Helper.GetSongDuration(resultFile);
-                        songs.Add(song);
-                    }
-                }
-            }
         }
     }
 }

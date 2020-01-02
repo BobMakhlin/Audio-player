@@ -2,6 +2,7 @@
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,13 +19,6 @@ namespace AudioPlayer.Helpers
             using (var mediaReader = new MediaFoundationReader(file))
             {
                 return mediaReader.TotalTime;
-            }
-        }
-        public static bool IsAudio(string file)
-        {
-            using (var mediaReader = new MediaFoundationReader(file))
-            {
-                return mediaReader.CanRead;
             }
         }
         public static string GetRandomImage()

@@ -1,6 +1,7 @@
-﻿using AudioPlayer.ViewModel;
+﻿using AudioPlayer.Models;
+using AudioPlayer.ViewModel;
+using AudioPlayer.ViewModels;
 using AudioPlayer.Views;
-using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Messaging;
 using NAudio.Wave;
 using System;
@@ -29,7 +30,26 @@ namespace AudioPlayer
         {
             InitializeComponent();
 
-            DataContext = new AppViewModel(new WindowService());
+            DataContext = new AppViewModel();
+
+            Messenger.Default.Register<NotificationMessage<Song>>(this,
+                c => ReceiveNotification(c.Notification, c.Content)
+                );
+        }
+
+        void ReceiveNotification(string msg, Song song)
+        {
+            switch (msg)
+            {
+                case "ShowEditSongWindow":
+                    var viewModel = new EditSongViewModel(song);
+                    var view = new EditSongWindow
+                    {
+                        DataContext = viewModel
+                    };
+                    view.ShowDialog();
+                    break;
+            }
         }
     }
 }
