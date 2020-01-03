@@ -1,4 +1,5 @@
-﻿using AudioPlayer.Helpers;
+﻿using AudioPlayer.AppData;
+using AudioPlayer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,42 +17,42 @@ namespace AudioPlayer.Models
 
             songs.Add(new Song
             {
-                Path = "Songs\\Abba - Happy new year.mp3",
+                SongPath = $"{AppFiles.SongsPath}\\Abba - Happy new year.mp3",
                 Author = "Abba",
                 Name = "Happy new year"
             });
             songs.Add(new Song
             {
-                Path = "Songs\\Gladiator - Now We Are Free.mp3",
+                SongPath = $"{AppFiles.SongsPath}\\Gladiator - Now We Are Free.mp3",
                 Author = "Gladiator",
                 Name = "Now We Are Free"
             });
             songs.Add(new Song
             {
-                Path = "Songs\\Sting - Shape of my heart.mp3",
+                SongPath = $"{AppFiles.SongsPath}\\Sting - Shape of my heart.mp3",
                 Author = "Sting",
                 Name = "Shape of my heart"
             });
             songs.Add(new Song
             {
-                Path = "Songs\\Pascal Letoublon - Friendships.mp3",
+                SongPath = $"{AppFiles.SongsPath}\\Pascal Letoublon - Friendships.mp3",
                 Author = "Pascal Letoublon",
                 Name = "Friendships"
             });
             songs.Add(new Song
             {
-                Path = "Songs\\Jingle bells.mp3",
+                SongPath = $"{AppFiles.SongsPath}\\Jingle bells.mp3",
                 Name = "Jingle bells"
             });
             songs.Add(new Song
             {
-                Path = "Songs\\Professional ost.mp3",
+                SongPath = $"{AppFiles.SongsPath}\\Professional ost.mp3",
                 Name = "Professional ost"
             });
 
             for (int i = 0; i < songs.Count; i++)
             {
-                songs[i].Duration = Helper.GetSongDuration(songs[i].Path);
+                songs[i].Duration = Helper.GetSongDuration(songs[i].SongPath);
             }
 
             return songs;

@@ -9,11 +9,18 @@ using AudioPlayer.Views;
 
 namespace AudioPlayer.WindowServices
 {
-    class WindowService : IWindowService
+    class SongWindowService : ISongWindowService
     {
-        public void ShowDialog(Song song)
+        public Song Song { get; set; }
+
+        public void ShowWindow()
         {
-            var viewModel = new EditSongViewModel(song);
+            if (Song == null)
+            {
+                throw new ArgumentNullException("Song");
+            }
+
+            var viewModel = new EditSongViewModel(Song);
             var view = new EditSongWindow
             {
                 DataContext = viewModel

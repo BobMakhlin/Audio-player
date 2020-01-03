@@ -6,7 +6,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:dd="urn:gong-wpf-dragdrop"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:AudioPlayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
@@ -24,8 +23,19 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
+        <Border Grid.Column="1" Height="300" Width="300"  BorderThickness="2" BorderBrush="DarkGray" Margin="0,0,0,70">
+            <Image Source="{Binding Path=CurrentSong.ImagePath, Mode=TwoWay}"
+                   dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding ImageDropHandler}">
+
+                <Image.InputBindings>
+                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding CommandOpenImage}"/>
+                </Image.InputBindings>
+
+            </Image>
+        </Border>
+        
         <ListBox ItemsSource="{Binding Songs}" SelectedValue="{Binding Path=CurrentSong, Mode=TwoWay}"
-                 dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" HorizontalContentAlignment="Stretch">
+                 dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding SongDropHandler}" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>

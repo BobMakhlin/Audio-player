@@ -1,4 +1,6 @@
-﻿using AudioPlayer.ViewModel;
+﻿using AudioPlayer.Models;
+using AudioPlayer.ViewModel;
+using AudioPlayer.ViewModels;
 using AudioPlayer.Views;
 using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Messaging;
@@ -29,7 +31,7 @@ namespace AudioPlayer
         {
             InitializeComponent();
 
-            DataContext = new AppViewModel(new WindowService());
+            DataContext = new AppViewModel(new SongWindowService(), new DialogService());
         }
     }
 }

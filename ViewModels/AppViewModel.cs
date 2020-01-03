@@ -1,4 +1,5 @@
 ﻿using AudioPlayer.AppData;
+using AudioPlayer.DropHandlers;
 using AudioPlayer.Helpers;
 using AudioPlayer.Models;
 using AudioPlayer.WindowServices;
@@ -21,7 +22,7 @@ using System.Windows.Threading;
 
 namespace AudioPlayer.ViewModel
 {
-    class AppViewModel : INotifyPropertyChanged, IDropTarget
+    class AppViewModel : INotifyPropertyChanged
     {
         WaveOutEvent wave;
         MediaFoundationReader mediaReader;
@@ -31,12 +32,21 @@ namespace AudioPlayer.ViewModel
 
         ObservableCollection<Song> songs;
 
-        public Song CurrentSong { get; set; }
+        ISongWindowService editSongService;
+        IDialogService dialogService;
+
+        Song currentSong;
+        public Song CurrentSong
+        { 
+            get => currentSong; 
+            set
+            {
+                currentSong = value;
+                INotifyPropertyChanged();
+            }
+        }
+
         public ObservableCollection<Song> Songs { get => songs; set => songs = value; }
-
-        const string Filename = "songs.bin";
-
-        IWindowService editSong;
 
         private Visibility buttonPlayVisiblity = Visibility.Visible;
         public Visibility ButtonPlayVisiblity
@@ -66,6 +76,10 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandDelete { get; private set; }
         public ICommand CommandEdit { get; private set; }
         public ICommand ProgramClosing { get; private set; }
+        public ICommand CommandOpenImage { get; private set; }
+
+        public IDropTarget SongDropHandler { get; private set; }
+        public IDropTarget ImageDropHandler { get; private set; }
 
         static AppViewModel()
         {
@@ -73,11 +87,11 @@ namespace AudioPlayer.ViewModel
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
         }
 
-        public AppViewModel(IWindowService editSongService)
+        public AppViewModel(ISongWindowService songService, IDialogService dlgService)
         {
             try
             {
-                songs = AppDataManager.LoadSongs(Filename);
+                songs = AppDataManager.LoadSongs(AppFiles.Filename);
             }
             catch (Exception)
             {
@@ -91,16 +105,25 @@ namespace AudioPlayer.ViewModel
 
             wave = new WaveOutEvent();
 
+            InitCommands();
+            SongDropHandler = new SongDropHandler(this);
+            ImageDropHandler = new ImageDropHandler(this);
+
+            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
+
+            editSongService = songService;
+            dialogService = dlgService;
+        }
+
+        void InitCommands()
+        {
             CommandPlay = new RelayCommand(PlayMusic);
             CommandPause = new RelayCommand(PauseMusic);
             CommandChangeSong = new RelayCommand(ChangeSong);
             CommandDelete = new RelayCommand<Song>(DeleteSong);
             CommandEdit = new RelayCommand<Song>(EditSong);
             ProgramClosing = new RelayCommand(OnProgramClosing);
-
-            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
-
-            editSong = editSongService;
+            CommandOpenImage = new RelayCommand(OpenSongImage);
         }
 
         private void PlayMusic()
@@ -111,7 +134,7 @@ namespace AudioPlayer.ViewModel
             // If music wasn't paused.
             if (mediaReader == null || mediaReader.Position == 0)
             {
-                mediaReader = new MediaFoundationReader(CurrentSong.Path);
+                mediaReader = new MediaFoundationReader(CurrentSong.SongPath);
                 wave.Init(mediaReader);
             }
 
@@ -146,12 +169,26 @@ namespace AudioPlayer.ViewModel
 
         void EditSong(Song song)
         {
-            editSong.ShowDialog(song);
+            editSongService.Song = song;
+            editSongService.ShowWindow();
         }
 
         void OnProgramClosing()
         {
-            AppDataManager.SaveSongs(Filename, songs);
+            AppDataManager.SaveSongs(AppFiles.Filename, songs);
+        }
+
+        void OpenSongImage()
+        {
+            if(dialogService.OpenFileDialog())
+            {
+                var file = dialogService.Path;
+                if (FileFormat.IsImage(file))
+                {
+                    var resultFile = Helper.CopyToImagesDir(file);
+                    CurrentSong.ImagePath = resultFile;
+                }
+            }
         }
 
         /// <summary>
@@ -176,36 +213,6 @@ namespace AudioPlayer.ViewModel
         void INotifyPropertyChanged([CallerMemberName] string propName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
-
-        void IDropTarget.DragOver(IDropInfo dropInfo)
-        {
-            dropInfo.Effects = DragDropEffects.Move;
-        }
-
-        void IDropTarget.Drop(IDropInfo dropInfo)
-        {
-            if (dropInfo.Data is DataObject obj)
-            {
-                var files = obj.GetFileDropList();
-                foreach (var file in files)
-                {
-                    if (Helper.IsAudio(file))
-                    {
-                        var filename = Path.GetFileNameWithoutExtension(file);
-                        var extension = Path.GetExtension(file);
-                        var resultFile = $"Songs\\{filename}-{Guid.NewGuid()}{extension}";
-                        File.Copy(file, resultFile);
-
-                        var song = new Song()
-                        {
-                            Path = resultFile
-                        };
-                        song.Duration = Helper.GetSongDuration(resultFile);
-                        songs.Add(song);
-                    }
-                }
-            }
         }
     }
 }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace AudioPlayer.WindowServices
 {
-    interface IWindowService
+    interface ISongWindowService : IWindowService
     {
-        void ShowWindow();
+        Song Song { get; set; }
     }
 }
