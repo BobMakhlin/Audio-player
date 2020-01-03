@@ -17,6 +17,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -37,8 +38,8 @@ namespace AudioPlayer.ViewModel
 
         Song currentSong;
         public Song CurrentSong
-        { 
-            get => currentSong; 
+        {
+            get => currentSong;
             set
             {
                 currentSong = value;
@@ -77,6 +78,8 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandEdit { get; private set; }
         public ICommand ProgramClosing { get; private set; }
         public ICommand CommandOpenImage { get; private set; }
+        public ICommand CommandPlayNextSong { get; private set; }
+        public ICommand CommandPlayPrevSong { get; private set; }
 
         public IDropTarget SongDropHandler { get; private set; }
         public IDropTarget ImageDropHandler { get; private set; }
@@ -124,6 +127,8 @@ namespace AudioPlayer.ViewModel
             CommandEdit = new RelayCommand<Song>(EditSong);
             ProgramClosing = new RelayCommand(OnProgramClosing);
             CommandOpenImage = new RelayCommand(OpenSongImage);
+            CommandPlayNextSong = new RelayCommand(PlayNextSong);
+            CommandPlayPrevSong = new RelayCommand(PlayPrevSong);
         }
 
         private void PlayMusic()
@@ -180,13 +185,47 @@ namespace AudioPlayer.ViewModel
 
         void OpenSongImage()
         {
-            if(dialogService.OpenFileDialog())
+            if (dialogService.OpenFileDialog())
             {
                 var file = dialogService.Path;
                 if (FileFormat.IsImage(file))
                 {
                     var resultFile = Helper.CopyToImagesDir(file);
                     CurrentSong.ImagePath = resultFile;
+                }
+            }
+        }
+
+        void PlayNextSong()
+        {
+            int pos = Songs.IndexOf(CurrentSong);
+
+            if (pos != -1)
+            {
+                if (pos < Songs.Count - 1)
+                {
+                    CurrentSong = Songs[pos + 1];
+                }
+                else
+                {
+                    CurrentSong = Songs[0];
+                }
+            }
+        }
+
+        void PlayPrevSong()
+        {
+            int pos = Songs.IndexOf(CurrentSong);
+
+            if (pos != -1)
+            {
+                if (pos > 0)
+                {
+                    CurrentSong = Songs[pos - 1];
+                }
+                else
+                {
+                    CurrentSong = Songs[Songs.Count - 1];
                 }
             }
         }
