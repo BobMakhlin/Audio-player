@@ -26,5 +26,23 @@ namespace AudioPlayer.Helpers
             var images = Directory.GetFiles($"{AppFiles.ImagesPath}\\");
             return images[rnd.Next(images.Length)];
         }
+        public static string CopyToImagesDir(string file)
+        {
+            var filename = Path.GetFileNameWithoutExtension(file);
+            var extension = Path.GetExtension(file);
+            var resultFile = $"{AppFiles.ImagesPath}\\{filename}-{Guid.NewGuid()}{extension}";
+            File.Copy(file, resultFile);
+
+            return resultFile;
+        }
+        public static string CopyToSongsDir(string file)
+        {
+            var filename = Path.GetFileNameWithoutExtension(file);
+            var extension = Path.GetExtension(file);
+            var resultFile = $"{AppFiles.SongsPath}\\{filename}-{Guid.NewGuid()}{extension}";
+            File.Copy(file, resultFile);
+
+            return resultFile;
+        }
     }
 }

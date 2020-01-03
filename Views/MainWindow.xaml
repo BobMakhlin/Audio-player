@@ -23,9 +23,15 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="1" Height="300" Width="300" BorderThickness="2" BorderBrush="DarkGray" Margin="0,0,0,70">
+        <Border Grid.Column="1" Height="300" Width="300"  BorderThickness="2" BorderBrush="DarkGray" Margin="0,0,0,70">
             <Image Source="{Binding Path=CurrentSong.ImagePath, Mode=TwoWay}"
-                   dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding ImageDropHandler}"/>
+                   dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding ImageDropHandler}">
+
+                <Image.InputBindings>
+                    <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding CommandOpenImage}"/>
+                </Image.InputBindings>
+
+            </Image>
         </Border>
         
         <ListBox ItemsSource="{Binding Songs}" SelectedValue="{Binding Path=CurrentSong, Mode=TwoWay}"

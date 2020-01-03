@@ -39,10 +39,7 @@ namespace AudioPlayer.DropHandlers
                 {
                     if (FileFormat.IsAudio(file))
                     {
-                        var filename = Path.GetFileNameWithoutExtension(file);
-                        var extension = Path.GetExtension(file);
-                        var resultFile = $"{AppFiles.SongsPath}\\{filename}-{Guid.NewGuid()}{extension}";
-                        File.Copy(file, resultFile);
+                        var resultFile = Helper.CopyToSongsDir(file);
 
                         var song = new Song()
                         {

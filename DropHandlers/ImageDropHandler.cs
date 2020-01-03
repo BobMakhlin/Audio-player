@@ -43,11 +43,7 @@ namespace AudioPlayer.DropHandlers
 
                     if (FileFormat.IsImage(file))
                     {
-                        var filename = Path.GetFileNameWithoutExtension(file);
-                        var extension = Path.GetExtension(file);
-                        var resultFile = $"{AppFiles.ImagesPath}\\{filename}-{Guid.NewGuid()}{extension}";
-                        File.Copy(file, resultFile);
-
+                        var resultFile = Helper.CopyToImagesDir(file);
                         viewModel.CurrentSong.ImagePath = resultFile;
                     }
                 }

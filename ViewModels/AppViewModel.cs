@@ -2,6 +2,7 @@
 using AudioPlayer.DropHandlers;
 using AudioPlayer.Helpers;
 using AudioPlayer.Models;
+using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GongSolutions.Wpf.DragDrop;
@@ -30,6 +31,9 @@ namespace AudioPlayer.ViewModel
         static DispatcherTimer timer;
 
         ObservableCollection<Song> songs;
+
+        ISongWindowService editSongService;
+        IDialogService dialogService;
 
         Song currentSong;
         public Song CurrentSong
@@ -72,6 +76,7 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandDelete { get; private set; }
         public ICommand CommandEdit { get; private set; }
         public ICommand ProgramClosing { get; private set; }
+        public ICommand CommandOpenImage { get; private set; }
 
         public IDropTarget SongDropHandler { get; private set; }
         public IDropTarget ImageDropHandler { get; private set; }
@@ -82,7 +87,7 @@ namespace AudioPlayer.ViewModel
             timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
         }
 
-        public AppViewModel()
+        public AppViewModel(ISongWindowService songService, IDialogService dlgService)
         {
             try
             {
@@ -105,6 +110,9 @@ namespace AudioPlayer.ViewModel
             ImageDropHandler = new ImageDropHandler(this);
 
             timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
+
+            editSongService = songService;
+            dialogService = dlgService;
         }
 
         void InitCommands()
@@ -115,6 +123,7 @@ namespace AudioPlayer.ViewModel
             CommandDelete = new RelayCommand<Song>(DeleteSong);
             CommandEdit = new RelayCommand<Song>(EditSong);
             ProgramClosing = new RelayCommand(OnProgramClosing);
+            CommandOpenImage = new RelayCommand(OpenSongImage);
         }
 
         private void PlayMusic()
@@ -160,14 +169,26 @@ namespace AudioPlayer.ViewModel
 
         void EditSong(Song song)
         {
-            Messenger.Default.Send(
-                new NotificationMessage<Song>(song, "ShowEditSongWindow")
-                );
+            editSongService.Song = song;
+            editSongService.ShowWindow();
         }
 
         void OnProgramClosing()
         {
             AppDataManager.SaveSongs(AppFiles.Filename, songs);
+        }
+
+        void OpenSongImage()
+        {
+            if(dialogService.OpenFileDialog())
+            {
+                var file = dialogService.Path;
+                if (FileFormat.IsImage(file))
+                {
+                    var resultFile = Helper.CopyToImagesDir(file);
+                    CurrentSong.ImagePath = resultFile;
+                }
+            }
         }
 
         /// <summary>
