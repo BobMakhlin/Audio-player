@@ -65,39 +65,46 @@
         </ListBox>
 
         <StackPanel VerticalAlignment="Bottom" Grid.Column="1">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,1">
+            <Grid  Margin="0,0,0,1">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Source="/Resources/img/prev-button.png" Margin="0,0,5,0" Height="50" Width="50">
+                        <Image.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlayPrevSong}"/>
+                        </Image.InputBindings>
+                    </Image>
 
-                <Image Source="/Resources/img/prev-button.png" Margin="0,0,5,0" Height="50" Width="50">
+                    <Grid Height="50" Width="50">
+                        <Image Source="/Resources/img/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
+                            <Image.InputBindings>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
+                            </Image.InputBindings>
+                        </Image>
+
+                        <Image Source="/Resources/img/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
+                            <Image.InputBindings>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
+                            </Image.InputBindings>
+                        </Image>
+                    </Grid>
+
+                    <Image Source="/Resources/img/next-button.png" Margin="5,0,0,0" Height="50" Width="50">
+                        <Image.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlayNextSong}"/>
+                        </Image.InputBindings>
+                    </Image>
+
+                </StackPanel>
+
+                <Image Source="/Resources/img/cycle-button.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right">
                     <Image.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlayPrevSong}"/>
                     </Image.InputBindings>
                 </Image>
-
-                <Grid Height="50" Width="50">
-                    <Image Source="/Resources/img/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
-                        <Image.InputBindings>
-                            <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
-                        </Image.InputBindings>
-                    </Image>
-
-                    <Image Source="/Resources/img/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
-                        <Image.InputBindings>
-                            <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
-                        </Image.InputBindings>
-                    </Image>
-                </Grid>
-
-                <Image Source="/Resources/img/next-button.png" Margin="5,0,0,0" Height="50" Width="50">
-                    <Image.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlayNextSong}"/>
-                    </Image.InputBindings>
-                </Image>
-
-            </StackPanel>
+            </Grid>
 
             <Slider Height="25" VerticalAlignment="Bottom"
-                Value="{Binding Path=MediaReader.Position, Mode=TwoWay}" 
-                Maximum="{Binding Path=MediaReader.Length, Mode=OneWay}"/>
+                Value="{Binding Path=Player.Position, Mode=TwoWay}" 
+                Maximum="{Binding Path=Player.Length, Mode=OneWay}"/>
         </StackPanel>
     </Grid>
 </Window>

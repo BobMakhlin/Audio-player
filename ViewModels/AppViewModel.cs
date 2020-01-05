@@ -2,6 +2,7 @@
 using AudioPlayer.DropHandlers;
 using AudioPlayer.Helpers;
 using AudioPlayer.Models;
+using AudioPlayer.Player;
 using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -25,9 +26,8 @@ namespace AudioPlayer.ViewModel
 {
     class AppViewModel : INotifyPropertyChanged
     {
-        WaveOutEvent wave;
-        MediaFoundationReader mediaReader;
-        public MediaFoundationReader MediaReader => mediaReader;
+        MediaPlayer player = new MediaPlayer();
+        public MediaPlayer Player => player;
 
         static DispatcherTimer timer;
 
@@ -106,13 +106,11 @@ namespace AudioPlayer.ViewModel
                 CurrentSong = songs[0];
             }
 
-            wave = new WaveOutEvent();
-
             InitCommands();
             SongDropHandler = new SongDropHandler(this);
             ImageDropHandler = new ImageDropHandler(this);
 
-            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
+            timer.Tick += (s, e) => INotifyPropertyChanged("Player");
 
             editSongService = songService;
             dialogService = dlgService;
@@ -136,14 +134,7 @@ namespace AudioPlayer.ViewModel
             if (CurrentSong == null)
                 return;
 
-            // If music wasn't paused.
-            if (mediaReader == null || mediaReader.Position == 0)
-            {
-                mediaReader = new MediaFoundationReader(CurrentSong.SongPath);
-                wave.Init(mediaReader);
-            }
-
-            wave.Play();
+            player.Play(CurrentSong.SongPath);
             timer.Start();
 
             ShowPauseButton();
@@ -151,7 +142,7 @@ namespace AudioPlayer.ViewModel
 
         private void PauseMusic()
         {
-            wave.Pause();
+            player.Pause();
             timer.Stop();
 
             ShowPlayButton();
@@ -159,10 +150,9 @@ namespace AudioPlayer.ViewModel
 
         void ChangeSong()
         {
-            mediaReader = null;
-            wave.Stop();
+            player.Stop();
             timer.Stop();
-            INotifyPropertyChanged("MediaReader");
+            INotifyPropertyChanged("Player");
 
             ShowPlayButton();
         }
