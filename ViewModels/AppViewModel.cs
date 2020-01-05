@@ -33,6 +33,8 @@ namespace AudioPlayer.ViewModel
 
         ObservableCollection<Song> songs;
 
+        public bool Cycle { get; set; } = false;
+
         ISongWindowService editSongService;
         IDialogService dialogService;
 
@@ -80,6 +82,7 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandOpenImage { get; private set; }
         public ICommand CommandPlayNextSong { get; private set; }
         public ICommand CommandPlayPrevSong { get; private set; }
+        public ICommand CommandCycleSong { get; private set; }
 
         public IDropTarget SongDropHandler { get; private set; }
         public IDropTarget ImageDropHandler { get; private set; }
@@ -110,10 +113,28 @@ namespace AudioPlayer.ViewModel
             SongDropHandler = new SongDropHandler(this);
             ImageDropHandler = new ImageDropHandler(this);
 
-            timer.Tick += (s, e) => INotifyPropertyChanged("Player");
+            timer.Tick += TimerTick;
 
             editSongService = songService;
             dialogService = dlgService;
+        }
+
+        private void TimerTick(object sender, EventArgs e)
+        {
+            INotifyPropertyChanged("Player");
+
+            if (player.IsSongFinished())
+            {
+                if (!Cycle)
+                {
+                    PlayNextSong();
+                    PlayMusic();
+                }
+                else
+                {
+                    player.Position = 0;
+                }
+            }
         }
 
         void InitCommands()
@@ -127,6 +148,7 @@ namespace AudioPlayer.ViewModel
             CommandOpenImage = new RelayCommand(OpenSongImage);
             CommandPlayNextSong = new RelayCommand(PlayNextSong);
             CommandPlayPrevSong = new RelayCommand(PlayPrevSong);
+            CommandCycleSong = new RelayCommand(CycleSong);
         }
 
         private void PlayMusic()
@@ -218,6 +240,11 @@ namespace AudioPlayer.ViewModel
                     CurrentSong = Songs[Songs.Count - 1];
                 }
             }
+        }
+
+        void CycleSong()
+        {
+            Cycle = !Cycle;
         }
 
         /// <summary>

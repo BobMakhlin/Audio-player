@@ -47,5 +47,10 @@ namespace AudioPlayer.Player
             wave.Stop();
             state = AudioState.Stoped;
         }
+
+        public bool IsSongFinished()
+        {
+            return (mediaReader.TotalTime - mediaReader.CurrentTime) < new TimeSpan(0, 0, 1);
+        }
     }
 }
