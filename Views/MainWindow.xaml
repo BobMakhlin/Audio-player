@@ -33,7 +33,7 @@
 
             </Image>
         </Border>
-        
+
         <ListBox ItemsSource="{Binding Songs}" SelectedValue="{Binding Path=CurrentSong, Mode=TwoWay}"
                  dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding SongDropHandler}" HorizontalContentAlignment="Stretch">
             <ListBox.ItemTemplate>
@@ -65,23 +65,84 @@
         </ListBox>
 
         <StackPanel VerticalAlignment="Bottom" Grid.Column="1">
-            <Grid Height="50" Width="50" HorizontalAlignment="Center">
-                <Image Source="/Resources/img/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
+            <Grid  Margin="0,0,0,1">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Source="/Resources/img/prev-button.png" Margin="0,0,5,0" Height="50" Width="50">
+                        <Image.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlayPrevSong}"/>
+                        </Image.InputBindings>
+                    </Image>
+
+                    <Grid Height="50" Width="50">
+                        <Image Source="/Resources/img/play-button.png" Visibility="{Binding Path=ButtonPlayVisiblity, Mode=OneWay}">
+                            <Image.InputBindings>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
+                            </Image.InputBindings>
+                        </Image>
+
+                        <Image Source="/Resources/img/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
+                            <Image.InputBindings>
+                                <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
+                            </Image.InputBindings>
+                        </Image>
+                    </Grid>
+
+                    <Image Source="/Resources/img/next-button.png" Margin="5,0,0,0" Height="50" Width="50">
+                        <Image.InputBindings>
+                            <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlayNextSong}"/>
+                        </Image.InputBindings>
+                    </Image>
+
+                </StackPanel>
+
+                <Image x:Name="iSelectedCycle" Source="/Resources/img/cycle-button/cycle-button-not-selected.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right">
+                    <Image.Triggers>
+                        <EventTrigger RoutedEvent="MouseLeftButtonUp">
+                            <BeginStoryboard>
+                                <!--Make "not-selected-cycle" visible and "selected-cycle" hidden-->
+                                <Storyboard>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="iNotSelectedCycle" Storyboard.TargetProperty="Visibility">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                                    </ObjectAnimationUsingKeyFrames>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+                                    </ObjectAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Image.Triggers>
+
                     <Image.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandPlay}"/>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandCycleSong}"/>
                     </Image.InputBindings>
                 </Image>
 
-                <Image Source="/Resources/img/pause-button.png" Visibility="{Binding Path=ButtonPauseVisibility, Mode=OneWay}">
+                <Image Name="iNotSelectedCycle" Source="/Resources/img/cycle-button/cycle-button-selected.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right" Visibility="Hidden">
+                    <Image.Triggers>
+                        <EventTrigger RoutedEvent="MouseLeftButtonUp">
+                            <BeginStoryboard>
+                                <!--Make "selected-cycle" visible and "not-selected-cycle" hidden-->
+                                <Storyboard>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="iSelectedCycle" Storyboard.TargetProperty="Visibility">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+                                    </ObjectAnimationUsingKeyFrames>
+                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
+                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+                                    </ObjectAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Image.Triggers>
+
                     <Image.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandPause}"/>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandCycleSong}"/>
                     </Image.InputBindings>
                 </Image>
             </Grid>
 
             <Slider Height="25" VerticalAlignment="Bottom"
-                Value="{Binding Path=MediaReader.Position, Mode=TwoWay}" 
-                Maximum="{Binding Path=MediaReader.Length, Mode=OneWay}"/>
+                Value="{Binding Path=Player.Position, Mode=TwoWay}" 
+                Maximum="{Binding Path=Player.Length, Mode=OneWay}"/>
         </StackPanel>
     </Grid>
 </Window>

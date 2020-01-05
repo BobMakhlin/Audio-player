@@ -2,6 +2,7 @@
 using AudioPlayer.DropHandlers;
 using AudioPlayer.Helpers;
 using AudioPlayer.Models;
+using AudioPlayer.Player;
 using AudioPlayer.WindowServices;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -17,6 +18,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -24,21 +26,22 @@ namespace AudioPlayer.ViewModel
 {
     class AppViewModel : INotifyPropertyChanged
     {
-        WaveOutEvent wave;
-        MediaFoundationReader mediaReader;
-        public MediaFoundationReader MediaReader => mediaReader;
+        MediaPlayer player = new MediaPlayer();
+        public MediaPlayer Player => player;
 
         static DispatcherTimer timer;
 
         ObservableCollection<Song> songs;
+
+        public bool Cycle { get; set; } = false;
 
         ISongWindowService editSongService;
         IDialogService dialogService;
 
         Song currentSong;
         public Song CurrentSong
-        { 
-            get => currentSong; 
+        {
+            get => currentSong;
             set
             {
                 currentSong = value;
@@ -77,6 +80,9 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandEdit { get; private set; }
         public ICommand ProgramClosing { get; private set; }
         public ICommand CommandOpenImage { get; private set; }
+        public ICommand CommandPlayNextSong { get; private set; }
+        public ICommand CommandPlayPrevSong { get; private set; }
+        public ICommand CommandCycleSong { get; private set; }
 
         public IDropTarget SongDropHandler { get; private set; }
         public IDropTarget ImageDropHandler { get; private set; }
@@ -103,16 +109,32 @@ namespace AudioPlayer.ViewModel
                 CurrentSong = songs[0];
             }
 
-            wave = new WaveOutEvent();
-
             InitCommands();
             SongDropHandler = new SongDropHandler(this);
             ImageDropHandler = new ImageDropHandler(this);
 
-            timer.Tick += (s, e) => INotifyPropertyChanged("MediaReader");
+            timer.Tick += TimerTick;
 
             editSongService = songService;
             dialogService = dlgService;
+        }
+
+        private void TimerTick(object sender, EventArgs e)
+        {
+            INotifyPropertyChanged("Player");
+
+            if (player.IsSongFinished())
+            {
+                if (!Cycle)
+                {
+                    PlayNextSong();
+                    PlayMusic();
+                }
+                else
+                {
+                    player.Position = 0;
+                }
+            }
         }
 
         void InitCommands()
@@ -124,6 +146,9 @@ namespace AudioPlayer.ViewModel
             CommandEdit = new RelayCommand<Song>(EditSong);
             ProgramClosing = new RelayCommand(OnProgramClosing);
             CommandOpenImage = new RelayCommand(OpenSongImage);
+            CommandPlayNextSong = new RelayCommand(PlayNextSong);
+            CommandPlayPrevSong = new RelayCommand(PlayPrevSong);
+            CommandCycleSong = new RelayCommand(CycleSong);
         }
 
         private void PlayMusic()
@@ -131,14 +156,7 @@ namespace AudioPlayer.ViewModel
             if (CurrentSong == null)
                 return;
 
-            // If music wasn't paused.
-            if (mediaReader == null || mediaReader.Position == 0)
-            {
-                mediaReader = new MediaFoundationReader(CurrentSong.SongPath);
-                wave.Init(mediaReader);
-            }
-
-            wave.Play();
+            player.Play(CurrentSong.SongPath);
             timer.Start();
 
             ShowPauseButton();
@@ -146,7 +164,7 @@ namespace AudioPlayer.ViewModel
 
         private void PauseMusic()
         {
-            wave.Pause();
+            player.Pause();
             timer.Stop();
 
             ShowPlayButton();
@@ -154,10 +172,9 @@ namespace AudioPlayer.ViewModel
 
         void ChangeSong()
         {
-            mediaReader = null;
-            wave.Stop();
+            player.Stop();
             timer.Stop();
-            INotifyPropertyChanged("MediaReader");
+            INotifyPropertyChanged("Player");
 
             ShowPlayButton();
         }
@@ -180,7 +197,7 @@ namespace AudioPlayer.ViewModel
 
         void OpenSongImage()
         {
-            if(dialogService.OpenFileDialog())
+            if (dialogService.OpenFileDialog())
             {
                 var file = dialogService.Path;
                 if (FileFormat.IsImage(file))
@@ -189,6 +206,45 @@ namespace AudioPlayer.ViewModel
                     CurrentSong.ImagePath = resultFile;
                 }
             }
+        }
+
+        void PlayNextSong()
+        {
+            int pos = Songs.IndexOf(CurrentSong);
+
+            if (pos != -1)
+            {
+                if (pos < Songs.Count - 1)
+                {
+                    CurrentSong = Songs[pos + 1];
+                }
+                else
+                {
+                    CurrentSong = Songs[0];
+                }
+            }
+        }
+
+        void PlayPrevSong()
+        {
+            int pos = Songs.IndexOf(CurrentSong);
+
+            if (pos != -1)
+            {
+                if (pos > 0)
+                {
+                    CurrentSong = Songs[pos - 1];
+                }
+                else
+                {
+                    CurrentSong = Songs[Songs.Count - 1];
+                }
+            }
+        }
+
+        void CycleSong()
+        {
+            Cycle = !Cycle;
         }
 
         /// <summary>
