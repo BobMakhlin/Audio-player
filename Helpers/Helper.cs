@@ -1,4 +1,5 @@
 ﻿using AudioPlayer.AppData;
+using AudioPlayer.Models;
 using NAudio.Wave;
 using System;
 using System.Collections.Generic;
@@ -23,14 +24,14 @@ namespace AudioPlayer.Helpers
         }
         public static string GetRandomImage()
         {
-            var images = Directory.GetFiles($"{AppFiles.ImagesPath}\\");
+            var images = Directory.GetFiles($"{AppFiles.StandartImagesPath}\\");
             return images[rnd.Next(images.Length)];
         }
         public static string CopyToImagesDir(string file)
         {
             var filename = Path.GetFileNameWithoutExtension(file);
             var extension = Path.GetExtension(file);
-            var resultFile = $"{AppFiles.ImagesPath}\\{filename}-{Guid.NewGuid()}{extension}";
+            var resultFile = $"{AppFiles.CustomImagesPath}\\{filename}-{Guid.NewGuid()}{extension}";
             File.Copy(file, resultFile);
 
             return resultFile;
@@ -39,7 +40,7 @@ namespace AudioPlayer.Helpers
         {
             var filename = Path.GetFileNameWithoutExtension(file);
             var extension = Path.GetExtension(file);
-            var resultFile = $"{AppFiles.SongsPath}\\{filename}-{Guid.NewGuid()}{extension}";
+            var resultFile = $"{AppFiles.CustomSongsPath}\\{filename}-{Guid.NewGuid()}{extension}";
             File.Copy(file, resultFile);
 
             return resultFile;

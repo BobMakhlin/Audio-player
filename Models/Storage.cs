@@ -17,36 +17,36 @@ namespace AudioPlayer.Models
 
             songs.Add(new Song
             {
-                SongPath = $"{AppFiles.SongsPath}\\Abba - Happy new year.mp3",
+                SongPath = $"{AppFiles.StandartSongsPath}\\Abba - Happy new year.mp3",
                 Author = "Abba",
                 Name = "Happy new year"
             });
             songs.Add(new Song
             {
-                SongPath = $"{AppFiles.SongsPath}\\Gladiator - Now We Are Free.mp3",
+                SongPath = $"{AppFiles.StandartSongsPath}\\Gladiator - Now We Are Free.mp3",
                 Author = "Gladiator",
                 Name = "Now We Are Free"
             });
             songs.Add(new Song
             {
-                SongPath = $"{AppFiles.SongsPath}\\Sting - Shape of my heart.mp3",
+                SongPath = $"{AppFiles.StandartSongsPath}\\Sting - Shape of my heart.mp3",
                 Author = "Sting",
                 Name = "Shape of my heart"
             });
             songs.Add(new Song
             {
-                SongPath = $"{AppFiles.SongsPath}\\Pascal Letoublon - Friendships.mp3",
+                SongPath = $"{AppFiles.StandartSongsPath}\\Pascal Letoublon - Friendships.mp3",
                 Author = "Pascal Letoublon",
                 Name = "Friendships"
             });
             songs.Add(new Song
             {
-                SongPath = $"{AppFiles.SongsPath}\\Jingle bells.mp3",
+                SongPath = $"{AppFiles.StandartSongsPath}\\Jingle bells.mp3",
                 Name = "Jingle bells"
             });
             songs.Add(new Song
             {
-                SongPath = $"{AppFiles.SongsPath}\\Professional ost.mp3",
+                SongPath = $"{AppFiles.StandartSongsPath}\\Professional ost.mp3",
                 Name = "Professional ost"
             });
 

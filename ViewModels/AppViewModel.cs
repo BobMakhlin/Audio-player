@@ -73,24 +73,24 @@ namespace AudioPlayer.ViewModel
             }
         }
 
-        Visibility buttonCycleVisibility = Visibility.Visible;
-        public Visibility ButtonCycleVisibility 
-        { 
-            get => buttonCycleVisibility;
-            set
-            {
-                buttonCycleVisibility = value;
-                INotifyPropertyChanged();
-            }
-        }
-
-        Visibility buttonCycleNotSelectedVisibility = Visibility.Hidden;
+        Visibility buttonCycleNotSelectedVisibility = Visibility.Visible;
         public Visibility ButtonCycleNotSelectedVisibility
         { 
             get => buttonCycleNotSelectedVisibility;
             set
             {
                 buttonCycleNotSelectedVisibility = value;
+                INotifyPropertyChanged();
+            }
+        }
+
+        Visibility buttonCycleVisibility = Visibility.Hidden;
+        public Visibility ButtonCycleVisibility 
+        { 
+            get => buttonCycleVisibility;
+            set
+            {
+                buttonCycleVisibility = value;
                 INotifyPropertyChanged();
             }
         }
