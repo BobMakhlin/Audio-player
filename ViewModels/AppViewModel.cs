@@ -73,6 +73,28 @@ namespace AudioPlayer.ViewModel
             }
         }
 
+        Visibility buttonCycleVisibility = Visibility.Visible;
+        public Visibility ButtonCycleVisibility 
+        { 
+            get => buttonCycleVisibility;
+            set
+            {
+                buttonCycleVisibility = value;
+                INotifyPropertyChanged();
+            }
+        }
+
+        Visibility buttonCycleNotSelectedVisibility = Visibility.Hidden;
+        public Visibility ButtonCycleNotSelectedVisibility
+        { 
+            get => buttonCycleNotSelectedVisibility;
+            set
+            {
+                buttonCycleNotSelectedVisibility = value;
+                INotifyPropertyChanged();
+            }
+        }
+
         public ICommand CommandPlay { get; private set; }
         public ICommand CommandPause { get; private set; }
         public ICommand CommandChangeSong { get; private set; }
@@ -83,6 +105,7 @@ namespace AudioPlayer.ViewModel
         public ICommand CommandPlayNextSong { get; private set; }
         public ICommand CommandPlayPrevSong { get; private set; }
         public ICommand CommandCycleSong { get; private set; }
+        public ICommand CommandUncycleSong { get; private set; }
 
         public IDropTarget SongDropHandler { get; private set; }
         public IDropTarget ImageDropHandler { get; private set; }
@@ -149,6 +172,7 @@ namespace AudioPlayer.ViewModel
             CommandPlayNextSong = new RelayCommand(PlayNextSong);
             CommandPlayPrevSong = new RelayCommand(PlayPrevSong);
             CommandCycleSong = new RelayCommand(CycleSong);
+            CommandUncycleSong = new RelayCommand(UncycleButton);
         }
 
         private void PlayMusic()
@@ -244,7 +268,13 @@ namespace AudioPlayer.ViewModel
 
         void CycleSong()
         {
-            Cycle = !Cycle;
+            Cycle = true;
+            ShowCycleButton();
+        }
+        void UncycleButton()
+        {
+            Cycle = false;
+            ShowCycleNotSelectedButton();
         }
 
         /// <summary>
@@ -262,6 +292,23 @@ namespace AudioPlayer.ViewModel
         {
             ButtonPlayVisiblity = Visibility.Hidden;
             ButtonPauseVisibility = Visibility.Visible;
+        }
+
+        /// <summary>
+        /// Make button "cycle" visible and button "cycle-not-selected" hidden.
+        /// </summary>
+        void ShowCycleButton()
+        {
+            ButtonCycleNotSelectedVisibility = Visibility.Hidden;
+            ButtonCycleVisibility = Visibility.Visible;
+        }
+        /// <summary>
+        /// Make button "cycle-not-selected" visible and button "cycle" hidden.
+        /// </summary>
+        void ShowCycleNotSelectedButton()
+        {
+            ButtonCycleVisibility = Visibility.Hidden;
+            ButtonCycleNotSelectedVisibility = Visibility.Visible;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

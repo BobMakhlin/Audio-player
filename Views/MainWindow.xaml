@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns:s="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:AudioPlayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
@@ -95,47 +96,17 @@
 
                 </StackPanel>
 
-                <Image x:Name="iSelectedCycle" Source="/Resources/img/cycle-button/cycle-button-not-selected.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right">
-                    <Image.Triggers>
-                        <EventTrigger RoutedEvent="MouseLeftButtonUp">
-                            <BeginStoryboard>
-                                <!--Make "not-selected-cycle" visible and "selected-cycle" hidden-->
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="iNotSelectedCycle" Storyboard.TargetProperty="Visibility">
-                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </Image.Triggers>
-
+                <Image Name="iSelectedCycle" Source="/Resources/img/cycle-button/cycle-button-not-selected.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right"
+                       Visibility="{Binding Path=ButtonCycleNotSelectedVisibility, Mode=OneWay}">
                     <Image.InputBindings>
                         <MouseBinding Gesture="LeftClick" Command="{Binding CommandCycleSong}"/>
                     </Image.InputBindings>
                 </Image>
 
-                <Image Name="iNotSelectedCycle" Source="/Resources/img/cycle-button/cycle-button-selected.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right" Visibility="Hidden">
-                    <Image.Triggers>
-                        <EventTrigger RoutedEvent="MouseLeftButtonUp">
-                            <BeginStoryboard>
-                                <!--Make "selected-cycle" visible and "not-selected-cycle" hidden-->
-                                <Storyboard>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="iSelectedCycle" Storyboard.TargetProperty="Visibility">
-                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-                                    </ObjectAnimationUsingKeyFrames>
-                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Visibility">
-                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
-                                    </ObjectAnimationUsingKeyFrames>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </Image.Triggers>
-
+                <Image Name="iNotSelectedCycle" Source="/Resources/img/cycle-button/cycle-button-selected.png" Margin="0,0,5,0" Height="50" Width="50" HorizontalAlignment="Right"
+                       Visibility="{Binding Path=ButtonCycleVisibility, Mode=OneWay}">
                     <Image.InputBindings>
-                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandCycleSong}"/>
+                        <MouseBinding Gesture="LeftClick" Command="{Binding CommandUncycleSong}"/>
                     </Image.InputBindings>
                 </Image>
             </Grid>

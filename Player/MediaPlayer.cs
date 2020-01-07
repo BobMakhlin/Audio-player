@@ -16,13 +16,10 @@ namespace AudioPlayer.Player
 
         public long Position
         {
-            get => mediaReader.Position;
+            get => mediaReader != null ? mediaReader.Position : 0;
             set => mediaReader.Position = value;
         }
-        public long Length
-        {
-            get => mediaReader.Length;
-        }
+        public long Length => mediaReader != null ? mediaReader.Length : 1;
 
         public void Pause()
         {
