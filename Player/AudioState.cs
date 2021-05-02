@@ -13,3 +13,5 @@ namespace AudioPlayer.Player
         Stoped
     }
 }
+
+// App Statement
